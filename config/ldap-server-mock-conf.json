@@ -1,0 +1,4 @@
+{
+  "port": 389,
+  "userLoginAttribute": "userPrincipalName"
+}

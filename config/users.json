@@ -1,0 +1,16 @@
+[
+  {
+    "dn": "cn=user,dc=test",
+    "cn": "dev1@mockldap.com",
+    "mail": "dev1@mockldap.com",
+    "userPrincipalName": "dev1@mockldap.com",
+    "password": "qwerty123"
+  },
+  {
+    "dn": "cn=user,dc=test",
+    "cn": "dev2@mockldap.com",
+    "mail": "dev2@mockldap.com",
+    "userPrincipalName": "dev2@mockldap.com",
+    "password": "qwerty123"
+  }
+]

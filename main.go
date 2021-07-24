@@ -2,22 +2,40 @@ package main
 
 import (
 	"fmt"
+	"godap/config"
 	"godap/godap"
+	"godap/utils"
+	"log"
 	"strings"
 )
 
 const (
-	PORT = ":389"
+	ServerConfigPATH = "./config/ldap-server-mock-conf.json"
+	UserDatabasePATH = "./config/users.json"
 )
 
 func main() {
-	hs := make([]godap.LDAPRequestHandler, 0)
+	var configData config.Data
+	err := utils.LoadJSONFile(ServerConfigPATH, &configData)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-	// use a LDAPBindFuncHandler to provide a callback function to respond
-	// to bind requests
+	var users []map[string]interface{}
+	err = utils.LoadJSONFile(UserDatabasePATH, &users)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	hs := make([]godap.LDAPRequestHandler, 0)
+	// use a LDAPBindFuncHandler to provide a callback function to respond to bind requests
 	hs = append(hs, &godap.LDAPBindFuncHandler{LDAPBindFunc: func(binddn string, bindpw []byte) bool {
-		if strings.Contains(binddn, "cn=Joe Dimaggio,") && string(bindpw) == "password" {
-			return true
+		for _, val := range users {
+			loginAttribute := val[configData.UserLoginAttribute].(string)
+			password := val["password"]
+			if strings.Contains(binddn, loginAttribute) && string(bindpw) == password {
+				return true
+			}
 		}
 		return false
 	}})
@@ -54,8 +72,8 @@ func main() {
 		Handlers: hs,
 	}
 
-	fmt.Println("Starting mock LDAP server on ", PORT)
-	err := s.ListenAndServe(PORT)
+	fmt.Println("Starting mock LDAP server on ", configData.Port)
+	err = s.ListenAndServe(fmt.Sprintf(":%d", configData.Port))
 	if err != nil {
 		fmt.Printf("Failed to start server. Error : %v", err)
 	}
