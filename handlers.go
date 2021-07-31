@@ -1,9 +1,8 @@
 package main
 
 import (
-	"godap/config"
 	"godap/godap"
-	"strings"
+	"godap/provider"
 )
 
 type Handlers interface {
@@ -12,21 +11,13 @@ type Handlers interface {
 }
 
 type handlers struct {
-	config config.Data
-	users  []map[string]interface{}
+	usersProvider provider.Users
 }
 
 // GetBindHandler returns a handler function to respond to bind requests
 func (h handlers) GetBindHandler() *godap.LDAPBindFuncHandler {
 	return &godap.LDAPBindFuncHandler{LDAPBindFunc: func(binddn string, bindpw []byte) bool {
-		for _, val := range h.users {
-			loginAttribute := val[h.config.UserLoginAttribute].(string)
-			password := val["password"]
-			if strings.Contains(binddn, loginAttribute) && string(bindpw) == password {
-				return true
-			}
-		}
-		return false
+		return h.usersProvider.AreValidCredentials(binddn, string(bindpw))
 	}}
 }
 
@@ -60,9 +51,6 @@ func (h handlers) GetSearchHandler() *godap.LDAPSimpleSearchFuncHandler {
 	}}
 }
 
-func NewRequestHandlers(config config.Data, users []map[string]interface{}) Handlers {
-	return handlers{
-		config: config,
-		users:  users,
-	}
+func NewRequestHandlers() Handlers {
+	return handlers{}
 }
