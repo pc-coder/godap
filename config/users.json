@@ -1,13 +1,14 @@
 [
   {
-    "dn": "cn=user,dc=test",
+    "dn": "CN=dev1,OU=Users,OU=Server,DC=MockLDAP,DC=com",
     "cn": "dev1@mockldap.com",
     "mail": "dev1@mockldap.com",
     "userPrincipalName": "dev1@mockldap.com",
-    "password": "qwerty123"
+    "password": "qwerty123",
+    "memberOf": "CN=development-group,OU=Groups,OU=Server,DC=MockLDAP,DC=com"
   },
   {
-    "dn": "cn=user,dc=test",
+    "dn": "CN=dev2,OU=Users,OU=Server,DC=MockLDAP,DC=com",
     "cn": "dev2@mockldap.com",
     "mail": "dev2@mockldap.com",
     "userPrincipalName": "dev2@mockldap.com",

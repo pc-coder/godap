@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"godap/config"
 	"godap/godap"
+	"godap/handler"
+	"godap/provider"
 	"godap/utils"
 	"log"
 )
@@ -26,7 +28,8 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	requestHandlers := NewRequestHandlers(configData, users)
+	usersProvider := provider.NewUsersProvider(configData, users)
+	requestHandlers := handler.NewRequestHandlers(usersProvider)
 
 	hs := []godap.LDAPRequestHandler{requestHandlers.GetBindHandler(), requestHandlers.GetSearchHandler()}
 

@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"godap/godap"
@@ -24,33 +24,12 @@ func (h handlers) GetBindHandler() *godap.LDAPBindFuncHandler {
 // GetSearchHandler returns a handler for simple search requests
 func (h handlers) GetSearchHandler() *godap.LDAPSimpleSearchFuncHandler {
 	return &godap.LDAPSimpleSearchFuncHandler{LDAPSimpleSearchFunc: func(req *godap.LDAPSimpleSearchRequest) []*godap.LDAPSimpleSearchResultEntry {
-
-		ret := make([]*godap.LDAPSimpleSearchResultEntry, 0, 1)
-
-		// here we produce a single search result that matches whatever
-		// they are searching for
-		if req.FilterAttr == "uid" {
-			ret = append(ret, &godap.LDAPSimpleSearchResultEntry{
-				DN: "cn=" + req.FilterValue + "," + req.BaseDN,
-				Attrs: map[string]interface{}{
-					"sn":            req.FilterValue,
-					"cn":            req.FilterValue,
-					"uid":           req.FilterValue,
-					"homeDirectory": "/home/" + req.FilterValue,
-					"objectClass": []string{
-						"top",
-						"posixAccount",
-						"inetOrgPerson",
-					},
-				},
-			})
-		}
-
-		return ret
-
+		return h.usersProvider.SearchForUserSearchAttribute(req.FilterValue)
 	}}
 }
 
-func NewRequestHandlers() Handlers {
-	return handlers{}
+func NewRequestHandlers(usersProvider provider.Users) Handlers {
+	return handlers{
+		usersProvider: usersProvider,
+	}
 }
